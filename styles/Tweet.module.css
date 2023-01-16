@@ -1,0 +1,38 @@
+.container {
+  background-color: #151d26;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  padding: 10px;
+  color: white;
+  border-bottom: #29313b solid 2px;
+}
+
+.nameAndtime {
+  color: gray;
+}
+
+.message {
+  margin: 15px;
+  overflow-wrap: break-word;
+}
+
+.heart {
+  color: white;
+  margin: 5px;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+}
+
+.colorHashtag {
+  color: blue;
+}
+
+.pp {
+  border-radius: 50%;
+  margin: 15px;
+}

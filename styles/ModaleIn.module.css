@@ -1,0 +1,61 @@
+.modale {
+  grid-row-start: 3;
+  grid-row-end: 10;
+  grid-column-start: 5;
+  grid-column-end: 9;
+}
+
+.X {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 15px;
+}
+
+.modaleIn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logoX {
+  margin-left: 50px;
+  cursor: pointer;
+  color: white;
+  margin-top: 15px;
+}
+
+.logoT {
+  color: white;
+  width: 50px;
+  height: 50px;
+  margin-top: 25px;
+  transform: rotate(180deg);
+  margin-bottom: 15px;
+}
+
+.text {
+  color: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.input {
+  background-color: transparent;
+  border-radius: 5px;
+  border: 1px solid #545f6a;
+  height: 40px;
+  width: 200px;
+  margin-bottom: 15px;
+  color: white;
+}
+
+.button {
+  border-radius: 25px;
+  width: 200px;
+  height: 30px;
+  border: none;
+  background-color: white;
+  color: black;
+  font-weight: 750;
+  cursor: pointer;
+}

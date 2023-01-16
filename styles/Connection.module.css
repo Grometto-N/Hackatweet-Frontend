@@ -1,0 +1,83 @@
+.main {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  grid-template-rows: repeat(12, 1fr);
+  grid-template-columns: repeat(12, 1fr);
+  background-color: #151d26;
+}
+
+.img {
+  background-image: url("../public/img_connection.png");
+  grid-row-start: 1;
+  grid-row-end: 13;
+  grid-column-start: 1;
+  grid-column-end: 6;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.right {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  grid-row-start: 1;
+  grid-row-end: 13;
+  grid-column-start: 6;
+  grid-column-end: 10;
+  margin-left: 50px;
+}
+
+.title {
+  font-size: 75px;
+}
+
+.littleTitle {
+  font-size: 30px;
+}
+
+.buttonUp {
+  border-radius: 25px;
+  width: 150px;
+  height: 40px;
+  border: none;
+  background-color: #3690ed;
+  color: white;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.buttonIn {
+  border-radius: 25px;
+  width: 150px;
+  height: 40px;
+  border: 2px solid #545f6a;
+  background-color: transparent;
+  color: #3690ed;
+  cursor: pointer;
+}
+
+.logo {
+  transform: rotate(180deg);
+  height: 50px;
+  width: 50px;
+  margin-top: 25px;
+}
+
+.logoLeft {
+  transform: rotate(180deg);
+  height: 250px;
+  width: 250px;
+  color: white;
+}
+
+.modaleUp {
+  grid-row-start: 3;
+  grid-row-end: 10;
+  grid-column-start: 7;
+  grid-column-end: 11;
+  border: 2px solid #545f6a;
+  border-radius: 15px;
+  background-color: #151d26;
+}
