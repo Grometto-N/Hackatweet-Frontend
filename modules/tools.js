@@ -32,5 +32,9 @@ function setSpan(message){
     return arraySpanHashtag;
 }
 
+function formattedDate(date){
+    
+}
+
 
 module.exports = { checkBody, getHashtags, setSpan };

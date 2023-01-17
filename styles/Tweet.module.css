@@ -23,6 +23,11 @@
   margin: 5px;
 }
 
+.trash {
+  color: white;
+  margin-left: 10px;
+}
+
 .info {
   display: flex;
   align-items: center;

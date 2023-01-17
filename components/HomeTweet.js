@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 
 import { useSelector, useDispatch } from "react-redux";
-import { addTweet, removeTweets } from "../reducers/alltweets";
+import { addTweet, removeTweets, setTweets } from "../reducers/alltweets";
 import { updateTrend, removeTrends,addTrends } from "../reducers/alltrends";
 import { removeUser } from "../reducers/user";
 
@@ -20,38 +20,60 @@ const { getHashtags, setSpan } = require("../modules/tools");
 
 function HomeTweet() {
   const dispatch = useDispatch();
-  //
+
+  // définitions des états utilisés
   const [theMessage, setTheMessage] = useState("");
-  const [theTweets, setTheTweets] = useState([]);
+  // const [theTweets, setTheTweets] = useState([]);
   const [theTrends, setTheTrends]=useState([]);
   const [changeTrendinDB, setChangeTrendinDB] = useState(false);
 
   //récuperation du user dans le reducer
   const theUser = useSelector((state) => state.user.value);
+  const theTweets = useSelector((state) => state.allTweets.value);
 
   // récuperation des trends dans le reducer
   //const theTrends = useSelector((state) => state.allTrends.value);
   
-  // récupération des tweet depuis la DB
+
+  //          INITIALISATION 
+  // récupération des tweets depuis la DB
   useEffect(() => {
-    fetch('http://localhost:3000/tweets')
+    fetch('http://localhost:3000/tweets',{
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: theUser.token})
+    })
     .then(response => response.json())
     .then(dataTweets => {
       if(dataTweets.result){
         // on ajoute les messages au reducer
-        const tweetsFromDB = [];
+        //const tweetsFromDB = []; // pour créer un tableau qu'on
         for(let item of dataTweets.data){
-          //const isUserLike = item.likes.some(elt => elt === theUser.token);
-            tweetsFromDB.unshift({
-              firstname: item.firstName,
-              username: item.userName,
-              date: item.Date,
-              message: item.message,
-              likes: item.likes.length,
-              userLike: false,
-            })
+            // tweetsFromDB.unshift({
+            //   tweetId : item.tweetId,
+            //   firstName: item.firstName,
+            //   userName: item.userName,
+            //   date: item.date,
+            //   message: item.message,
+            //   likes: item.likes.length,
+            //   isLiked: item.isLikedByUser,
+            //   isUserTweet : true,
+            // })
+            dispatch(addTweet(
+              {
+                  tweetId : item.tweetId,
+                  firstName: item.firstName,
+                  userName: item.userName,
+                  date: item.date,
+                  message: item.message,
+                  likes: item.likes.length,
+                  isLiked: item.isLikedByUser,
+                  isUserTweet : item.isUserTweet,
+                }
+            ))
         }// fin fetch tweets
-        setTheTweets(tweetsFromDB)
+        // setTheTweets(tweetsFromDB)
+        // dispatch(setTweets(tweetsFromDB));
 
         // on récupère les trends
         fetch('http://localhost:3000/trends/all')
@@ -87,12 +109,9 @@ function HomeTweet() {
       })
     },[changeTrendinDB]);
 
-  // click enter
-  const handlekeypress = (e) => {
-    if (e.key === "Enter") {
-      handleTweet();
-    }
-  };
+ 
+
+  //    GESTION DES "BOUTONS"
 
   // gestion du click sur le bouton tweet
   const handleTweet = () => {
@@ -107,14 +126,14 @@ function HomeTweet() {
     .then((dataTweet) => {
         if (dataTweet.result) {
           // on ajoute le 
-          setTheTweets([{
-            firstname: theUser.firstName,
-            username: theUser.userName,
+          dispatch(addTweet([{
+            firstName: theUser.firstName,
+            userName: theUser.userName,
             date: Date.now(),
             message: theMessage,
             likes: 0,
-            userLike: false,
-          },...theTweets])
+            isLiked: false,
+          },...theTweets]))
           // on met à jour les trends en DB en parcourant les trends
           for(let item of theHashtags){
               fetch("http://localhost:3000/trends/add", {
@@ -147,39 +166,48 @@ function HomeTweet() {
     // on reset l'input
     setTheMessage("");
   };
-  
-  const router = useRouter();
-  const navigate = () => {
-    router.push("/connection");
+
+   // click enter de l'input du tweet
+   const handlekeypress = (e) => {
+    if (e.key === "Enter") {
+      handleTweet();
+    }
   };
+  
+  // gestion du bouton logout : on efface tous le contenu des reducers et on retourne à la page d'accueil
   const handleLogout = () => {
-      //on efface tous les reducers
       dispatch(removeUser());
       dispatch(removeTrends());
       dispatch(removeTweets());
       navigate();
   }
+
+  
+  //     NAVIGATION
+  const router = useRouter();
+  const navigate = () => {
+    router.push("/connection");
+  };
+
+
   //          AFFICHAGE
-  // affichage des tweets
-  const displayTweets = theTweets.map((elt, i) => {
+  //variable affichage des tweets
+  const displayTweets = theTweets.map((eltTweet, i) => {
     return (
       <Tweet
         key={i}
-        firstname={elt.firstname}
-        username={elt.username}
-        date={elt.date}
-        message={elt.message}
-        likes={elt.likes}
-        isliked={false}
+        tweetDatas = {eltTweet}
       />
     );
   });
 
-  console.log(theTrends)
-  // affiche des trends
+
+  // variable affichage des trends
   const displayTrends = theTrends.map((elt, i) => {
     return <Trend key={i} title={elt.title} occurence={elt.occurence} />;
   });
+
+  // affichage globale du composant 
   return (
     <div className={styles.container}>
       {/* LEFT */}

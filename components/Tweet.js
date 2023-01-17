@@ -1,51 +1,53 @@
 import styles from "../styles/Tweet.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 const { setSpan, getHashtags } = require("../modules/tools");
-import { useSelector} from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {updateLike} from "../reducers/alltweets";
 
+// Composant gérant l'affichage d'un tweet. La props est un objet avec les différentes informations : id, firstname, username, date , message, likes, isliked
 function Tweet(props) {
-  const [isLiked, setIsLiked] = useState(props.userLike);
-  const [nbLike, setNbLike] = useState(props.likes);
+
+  const dispatch = useDispatch();
 
   //récuperation du user dans le reducer
   const theUser = useSelector((state) => state.user.value);
 
-
-// style du coeur selon s'il est séléctionné ou non
-  let heartIconStyle = { cursor: "pointer" };
-  if (isLiked) {
-    heartIconStyle = { color: "#e74c3c", cursor: "pointer" };
-  }
-
-  // click heart
+  // click sur le coeur
   const handleLike = () => {
     // on change en DB ajout ou suppression
     fetch("http://localhost:3000/tweets/like", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token, message : props.message, hashtags : getHashtags(props.message)}),
+      body: JSON.stringify({ token: theUser.token, message : props.tweetDatas.message, hashtags : getHashtags(props.tweetDatas.message)}),
     })
     .then((response) => response.json())
     .then((data) => {
-        console.log('hashtags', getHashtags(props.message))
+        if(data.result){
+            // enregistrement réussi : on met à jour le reducer
+            dispatch(updateLike({
+              message : props.tweetDatas.message,
+              likes: data.nbLike,
+              isLiked: data.likedByUser
+            }))
+        }
     })
-    if(isLiked){
-      // on met à jour l'état 
-      setNbLike(nbLike-1);
-    }
-    if(!isLiked){
-      // on ajoute le user dans le tweet de la DB
-      setNbLike(nbLike+1);
-    }
-    setIsLiked(!isLiked);
   };
+
+  // style du coeur selon s'il est séléctionné ou non
+  let heartIconStyle = { cursor: "pointer" };
+  if (props.tweetDatas.isLiked) {
+    heartIconStyle = { color: "#e74c3c", cursor: "pointer" };
+  }
+
+  // gestion de l'icône delete
 
   return (
     <div className={styles.container}>
+      {/* En-tête du tweet : image + info sur l'auteur du tweet + date*/}
       <div className={styles.info}>
         <div>
           <Image
@@ -56,12 +58,13 @@ function Tweet(props) {
             className={styles.pp}
           />
         </div>
-        {props.firstname}
+        {props.tweetDatas.firstName}
         <span className={styles.nameAndtime}>
-          @{props.username} - {props.date}
+          @{props.tweetDatas.userName} - {props.tweetDatas.date}
         </span>
       </div>
-      <div className={styles.message}>{props.message}</div>
+      {/* Message  */}
+      <div className={styles.message}>{props.tweetDatas.message}</div>
       <div className={styles.like}>
         <span className={styles.heart}>
           <FontAwesomeIcon
@@ -71,7 +74,14 @@ function Tweet(props) {
             className="like"
           />
         </span>
-        <span>{nbLike}</span>
+        <span>{props.tweetDatas.likes}</span>
+        {props.tweetDatas.isUserTweet && <span className={styles.trash}>
+          <FontAwesomeIcon
+            icon={faTrashCan}
+            onClick={() => handleLike()}
+            className="like"
+          />
+        </span>}
       </div>
     </div>
   );
