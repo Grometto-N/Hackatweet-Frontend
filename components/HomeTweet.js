@@ -5,15 +5,17 @@ import Trend from "./Trend";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
 
+import Image from "next/image";
+import { useRouter } from "next/router";
+import Link from 'next/link';
+
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addTweet, removeTweets, setTweets } from "../reducers/alltweets";
 import { updateTrend, removeTrends,addTrends } from "../reducers/alltrends";
 import { removeUser } from "../reducers/user";
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
 
-import { useRouter } from "next/router";
 
 
 const { getHashtags, setSpan } = require("../modules/tools");
@@ -49,16 +51,6 @@ function HomeTweet() {
         // on ajoute les messages au reducer
         //const tweetsFromDB = []; // pour créer un tableau qu'on
         for(let item of dataTweets.data){
-            // tweetsFromDB.unshift({
-            //   tweetId : item.tweetId,
-            //   firstName: item.firstName,
-            //   userName: item.userName,
-            //   date: item.date,
-            //   message: item.message,
-            //   likes: item.likes.length,
-            //   isLiked: item.isLikedByUser,
-            //   isUserTweet : true,
-            // })
             dispatch(addTweet(
               {
                   tweetId : item.tweetId,
@@ -72,28 +64,27 @@ function HomeTweet() {
                 }
             ))
         }// fin fetch tweets
-        // setTheTweets(tweetsFromDB)
-        // dispatch(setTweets(tweetsFromDB));
+        
 
         // on récupère les trends
-        fetch('http://localhost:3000/trends/all')
-        .then(response => response.json())
-        .then(dataTrends => {
-            if(dataTrends.result && dataTrends.trends.length>0){
-                const trendsFromDB = [];
-                for(let oneTrend of dataTrends.trends){
-                  //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
-                  trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
-                }
-                setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
-            }
-        })// fin fetch trends
+        // fetch('http://localhost:3000/trends/all')
+        // .then(response => response.json())
+        // .then(dataTrends => {
+        //     if(dataTrends.result && dataTrends.trends.length>0){
+        //         const trendsFromDB = [];
+        //         for(let oneTrend of dataTrends.trends){
+        //           //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
+        //           trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
+        //         }
+        //         setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
+        //     }
+        // })// fin fetch trends
       }  
     })
        
     },[]);
 
-    useEffect(() => {
+    useEffect(() => {console.log("ici encore")
       // on récupère les trends
       fetch('http://localhost:3000/trends/all')
       .then(response => response.json())
@@ -101,13 +92,12 @@ function HomeTweet() {
           if(dataTrends.result && dataTrends.trends.length>0){
               const trendsFromDB = [];
               for(let oneTrend of dataTrends.trends){
-                //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
                 trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
               }
               setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
           }
       })
-    },[changeTrendinDB]);
+    },[theTweets]);
 
  
 
@@ -125,46 +115,41 @@ function HomeTweet() {
     .then((response) => response.json())
     .then((dataTweet) => {
         if (dataTweet.result) {
-          // on ajoute le 
-          dispatch(addTweet([{
+          // on met à jour les trends en DB en parcourant les trends
+          fetch("http://localhost:3000/trends/add", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ hashtags  : theHashtags, idTweet:  dataTweet.tweetId }),
+            }).then((response) => response.json())
+              .then( dataTrends => {
+              })
+          // on ajoute le tweet au reducer pour l'affichage
+          dispatch(addTweet({
+            tweetId : dataTweet.tweetId,
             firstName: theUser.firstName,
             userName: theUser.userName,
             date: Date.now(),
             message: theMessage,
             likes: 0,
             isLiked: false,
-          },...theTweets]))
-          // on met à jour les trends en DB en parcourant les trends
-          for(let item of theHashtags){
-              fetch("http://localhost:3000/trends/add", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ hashtag  : item, idTweet: dataTweet.id }),
-              }).then((response) => response.json())
-                .then( dataTrends => {
-                  if(dataTrends.result){
-                      //setChange(!changeTrendinDB)
-                  }
-                });
-          }// fin du for sur les hashtags
-          
-          
-        }  
+            isUserTweet : true,
+          }))
+            }
       })  
-      fetch('http://localhost:3000/trends/all')
-      .then(response => response.json())
-      .then(dataTrends => {
-          if(dataTrends.result && dataTrends.trends.length>0){
-              const trendsFromDB = [];
-              for(let oneTrend of dataTrends.trends){
-                //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
-                trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
-              }
-              setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
-          }
-      })
-    // on reset l'input
-    setTheMessage("");
+    //   fetch('http://localhost:3000/trends/all')
+    //   .then(response => response.json())
+    //   .then(dataTrends => {
+    //       if(dataTrends.result && dataTrends.trends.length>0){
+    //           const trendsFromDB = [];
+    //           for(let oneTrend of dataTrends.trends){
+    //             //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
+    //             trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
+    //           }
+    //           setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
+    //       }
+    //   })
+    // // on reset l'input
+    // setTheMessage("");
   };
 
    // click enter de l'input du tweet
@@ -204,7 +189,7 @@ function HomeTweet() {
 
   // variable affichage des trends
   const displayTrends = theTrends.map((elt, i) => {
-    return <Trend key={i} title={elt.title} occurence={elt.occurence} />;
+    return (<Trend key={i} title={elt.title} occurence={elt.occurence} />) ;
   });
 
   // affichage globale du composant 
@@ -213,7 +198,9 @@ function HomeTweet() {
       {/* LEFT */}
       <div className={styles.leftContainer}>
           <div className={styles.logoLeft}>
+            {/* <Link href="/essai"> */}
             <FontAwesomeIcon icon={faTwitter} className={styles.logoApp} />
+            {/* </Link> */}
           </div>
           {/* Bottom */}
           <div className={styles.bottom}>
@@ -238,7 +225,7 @@ function HomeTweet() {
       </div>
       {/* HOME */}
       <div className={styles.home}>
-        <span>Home</span>
+      <span>Home</span>
         <div className={styles.tweetwriting}>
           {/* Input du tweet */}
           <input

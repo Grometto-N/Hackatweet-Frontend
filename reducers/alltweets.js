@@ -18,11 +18,13 @@ export const allTweetsSlice = createSlice({
     setTweets: (state, action) => {
       state.value=action.payload;
     },
+    deleteOneTweet: (state, action) => {
+      state.value=state.value.filter(eltTweet => eltTweet.tweetId !== action.payload);
+    },
     // action.payload sera un objet avec les clés : {message, isliked, likes}
     updateLike: (state, action) => {
       state.value=state.value.map(elt =>{
         if(elt.message === action.payload.message){
-          console.log(elt.firstName)
           return {tweetId : elt.tweetId,
             firstName: elt.firstName,
             userName: elt.userName,
@@ -39,5 +41,5 @@ export const allTweetsSlice = createSlice({
   },
 });
 
-export const { addTweet , removeTweets, setTweets, updateLike} = allTweetsSlice.actions; 
+export const { addTweet , removeTweets, setTweets, updateLike, deleteOneTweet} = allTweetsSlice.actions; 
 export default allTweetsSlice.reducer;

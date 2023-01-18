@@ -4,9 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-const { setSpan, getHashtags } = require("../modules/tools");
+const { setSpan, getHashtags, formattedDate } = require("../modules/tools");
 import { useSelector, useDispatch } from "react-redux";
-import {updateLike} from "../reducers/alltweets";
+import {updateLike, deleteOneTweet} from "../reducers/alltweets";
 
 // Composant gérant l'affichage d'un tweet. La props est un objet avec les différentes informations : id, firstname, username, date , message, likes, isliked
 function Tweet(props) {
@@ -37,6 +37,23 @@ function Tweet(props) {
     })
   };
 
+  // click sur la corbeille
+  const handleDelete = () => {
+    // on change en DB ajout ou suppression
+    fetch("http://localhost:3000/tweets/one", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, userName : theUser.userName}),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if(data.result){
+            // suppression réussie : on met à jour le reducer
+            dispatch(deleteOneTweet(props.tweetDatas.tweetId))
+        }
+    })
+  };
+
   // style du coeur selon s'il est séléctionné ou non
   let heartIconStyle = { cursor: "pointer" };
   if (props.tweetDatas.isLiked) {
@@ -60,7 +77,7 @@ function Tweet(props) {
         </div>
         {props.tweetDatas.firstName}
         <span className={styles.nameAndtime}>
-          @{props.tweetDatas.userName} - {props.tweetDatas.date}
+          @{props.tweetDatas.userName} - {formattedDate(props.tweetDatas.date)}
         </span>
       </div>
       {/* Message  */}
@@ -78,8 +95,8 @@ function Tweet(props) {
         {props.tweetDatas.isUserTweet && <span className={styles.trash}>
           <FontAwesomeIcon
             icon={faTrashCan}
-            onClick={() => handleLike()}
-            className="like"
+            onClick={() => handleDelete()}
+            className="trash"
           />
         </span>}
       </div>
