@@ -1,6 +1,6 @@
-import styles from "../styles/HomeTweet.module.css";
+import styles from "../styles/Hashtags.module.css";
 import Tweet from "./Tweet";
-import Trend from "./Trend";
+import Trends from "./Trends";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -24,21 +24,86 @@ function Hashtags() {
   const dispatch = useDispatch();
 
   // définitions des états utilisés
-  const [theMessage, setTheMessage] = useState("");
+  const [hashtagInput, setHashtagInput] = useState("");
   // const [theTweets, setTheTweets] = useState([]);
-  const [theTrends, setTheTrends]=useState([]);
-  const [changeTrendinDB, setChangeTrendinDB] = useState(false);
 
   //récuperation du user dans le reducer
   const theUser = useSelector((state) => state.user.value);
   const theTweets = useSelector((state) => state.allTweets.value);
 
+// récupération données navigation 
+  const router = useRouter();
+
   // récuperation des trends dans le reducer
   //const theTrends = useSelector((state) => state.allTrends.value);
   
+  //     NAVIGATION
+  const navigate = () => {
+    router.push("/connection");
+  };
 
-  //          INITIALISATION 
 
+  //          INITIALISATION DE LA PAGE
+
+  const { hashtags } = router.query;
+  useEffect(() => {
+    fetch(`http://localhost:3000/tweets/${hashtags}`,{
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: theUser.token})
+    })
+    .then(response => response.json())
+    .then(dataTweets => {
+      if(dataTweets.result){
+        // on ajoute les messages au reducer
+        const tweetsFromDB = []; // pour créer un tableau qu'on
+        for(let item of dataTweets.data){
+          tweetsFromDB.unshift({
+            tweetId : item.tweetId,
+            firstName: item.firstName,
+            userName: item.userName,
+            date: item.date,
+            message: item.message,
+            likes: item.likes.length,
+            isLiked: item.isLikedByUser,
+            isUserTweet : item.isUserTweet,
+          })              
+        }
+        dispatch(setTweets(tweetsFromDB))
+      }
+
+  }) },[hashtags]);
+
+
+  //  GESTION DES BOUTONS
+
+  // gestion du bouton recherche
+  const handleSearch= () => {
+    fetch(`http://localhost:3000/tweets/${hashtagInput.replace("#","")}`,{
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: theUser.token})
+    })
+    .then(response => response.json())
+    .then(dataTweets => {
+      if(dataTweets.result){
+        // on ajoute les messages au reducer
+        const tweetsFromDB = []; // pour créer un tableau qu'on
+        for(let item of dataTweets.data){
+          tweetsFromDB.unshift({
+            tweetId : item.tweetId,
+            firstName: item.firstName,
+            userName: item.userName,
+            date: item.date,
+            message: item.message,
+            likes: item.likes.length,
+            isLiked: item.isLikedByUser,
+            isUserTweet : item.isUserTweet,
+          })              
+        }
+        dispatch(setTweets(tweetsFromDB))
+      }})
+  }
   
   // gestion du bouton logout : on efface tous le contenu des reducers et on retourne à la page d'accueil
   const handleLogout = () => {
@@ -48,17 +113,18 @@ function Hashtags() {
       navigate();
   }
 
+  const handleKeyPress = (event) =>{
+    if(event.key === "Enter"){
+      handleSearch();
+    }
+  }
   
-  //     NAVIGATION
-  const router = useRouter();
-  const navigate = () => {
-    router.push("/connection");
-  };
-
 
   //          AFFICHAGE
   //variable affichage des tweets
-  const displayTweets = theTweets.map((eltTweet, i) => {
+let displayTweets = (<h4 className={styles.notFound}>No tweet found</h4>)
+if(theTweets.length>0){
+  displayTweets = theTweets.map((eltTweet, i) => {
     return (
       <Tweet
         key={i}
@@ -66,12 +132,9 @@ function Hashtags() {
       />
     );
   });
+}
 
 
-  // variable affichage des trends
-  const displayTrends = theTrends.map((elt, i) => {
-    return <Trend key={i} title={elt.title} occurence={elt.occurence} />;
-  });
 
   // affichage globale du composant 
   return (
@@ -107,14 +170,16 @@ function Hashtags() {
       {/* HOME */}
       <div className={styles.home}>
         <span>Hashtags</span>
-        <div className={styles.tweetwriting}>
+        <div className={styles.hashtagwriting}>
           {/* Input du tweet */}
           <input
             type="text"
-            placeholder="Hashtags ?"
-            className={styles.inputTweet}
-            onChange={(e) => setTheMessage(e.target.value)}
-            value={theMessage}
+            placeholder="Search Hashtag"
+            className={styles.inputHashtag}
+            onChange={(e) => setHashtagInput(e.target.value)}
+            // onKeyPress={(e) => handleKeyPress(e)}
+            onKeyDown={(e) => handleKeyPress(e)}
+            value={hashtagInput}
           />
         </div>
       </div>
@@ -123,7 +188,7 @@ function Hashtags() {
       {/* RIGHT */}
       <div className={styles.rightContainer}>
         <span> Trends </span>
-        <div className={styles.trendsContainer}>{displayTrends}</div>
+        <div className={styles.trendsContainer}> <Trends /></div>
       </div>
     </div>  
   );

@@ -2,12 +2,16 @@
   display: flex;
   flex-direction: column;
   align-items: left;
+  padding-left: 10px;
 }
 
 .title {
   color: white;
+  margin-top: 5px;
+  margin-bottom: 2px;
 }
 
 .occurence {
   color: gray;
+  margin-bottom: 8px;
 }

@@ -1,6 +1,6 @@
 import styles from "../styles/HomeTweet.module.css";
 import Tweet from "./Tweet";
-import Trend from "./Trend";
+import Trends from "./Trends";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -49,21 +49,21 @@ function HomeTweet() {
     .then(dataTweets => {
       if(dataTweets.result){
         // on ajoute les messages au reducer
-        //const tweetsFromDB = []; // pour créer un tableau qu'on
+        const tweetsFromDB = []; // pour créer un tableau qu'on
         for(let item of dataTweets.data){
-            dispatch(addTweet(
-              {
-                  tweetId : item.tweetId,
-                  firstName: item.firstName,
-                  userName: item.userName,
-                  date: item.date,
-                  message: item.message,
-                  likes: item.likes.length,
-                  isLiked: item.isLikedByUser,
-                  isUserTweet : item.isUserTweet,
-                }
-            ))
-        }// fin fetch tweets
+          tweetsFromDB.unshift({
+            tweetId : item.tweetId,
+            firstName: item.firstName,
+            userName: item.userName,
+            date: item.date,
+            message: item.message,
+            likes: item.likes.length,
+            isLiked: item.isLikedByUser,
+            isUserTweet : item.isUserTweet,
+          })              
+        }
+        dispatch(setTweets(tweetsFromDB))
+        
         
 
         // on récupère les trends
@@ -84,20 +84,7 @@ function HomeTweet() {
        
     },[]);
 
-    useEffect(() => {console.log("ici encore")
-      // on récupère les trends
-      fetch('http://localhost:3000/trends/all')
-      .then(response => response.json())
-      .then(dataTrends => {
-          if(dataTrends.result && dataTrends.trends.length>0){
-              const trendsFromDB = [];
-              for(let oneTrend of dataTrends.trends){
-                trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
-              }
-              setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
-          }
-      })
-    },[theTweets]);
+    
 
  
 
@@ -105,12 +92,11 @@ function HomeTweet() {
 
   // gestion du click sur le bouton tweet
   const handleTweet = () => {
-    const theHashtags = getHashtags(theMessage)
     // on rajoute le tweet en DB
     fetch("http://localhost:3000/tweets/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token, message : theMessage, hashtags: theHashtags }),
+      body: JSON.stringify({ token: theUser.token, message : theMessage, hashtags: getHashtags(theMessage) }),
     })
     .then((response) => response.json())
     .then((dataTweet) => {
@@ -119,7 +105,7 @@ function HomeTweet() {
           fetch("http://localhost:3000/trends/add", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ hashtags  : theHashtags, idTweet:  dataTweet.tweetId }),
+              body: JSON.stringify({ hashtags  : getHashtags(theMessage), idTweet:  dataTweet.tweetId }),
             }).then((response) => response.json())
               .then( dataTrends => {
               })
@@ -149,7 +135,7 @@ function HomeTweet() {
     //       }
     //   })
     // // on reset l'input
-    // setTheMessage("");
+     setTheMessage("");
   };
 
    // click enter de l'input du tweet
@@ -177,21 +163,27 @@ function HomeTweet() {
 
   //          AFFICHAGE
   //variable affichage des tweets
-  const displayTweets = theTweets.map((eltTweet, i) => {
-    return (
-      <Tweet
-        key={i}
-        tweetDatas = {eltTweet}
-      />
-    );
-  });
+  // const displayTweets = theTweets.map((eltTweet, i) => {
+  //   return (
+  //     <Tweet
+  //       key={i}
+  //       tweetDatas = {eltTweet}
+  //     />
+  //   );
+  // });
 
-
-  // variable affichage des trends
-  const displayTrends = theTrends.map((elt, i) => {
-    return (<Trend key={i} title={elt.title} occurence={elt.occurence} />) ;
-  });
-
+  let displayTweets = (<h4 className={styles.notFound}>No tweet found</h4>)
+  if(theTweets.length>0){
+    displayTweets = theTweets.map((eltTweet, i) => {
+      return (
+        <Tweet
+          key={i}
+          tweetDatas = {eltTweet}
+        />
+      );
+    });
+  }
+ 
   // affichage globale du composant 
   return (
     <div className={styles.container}>
@@ -249,7 +241,8 @@ function HomeTweet() {
       {/* RIGHT */}
       <div className={styles.rightContainer}>
         <span> Trends </span>
-        <div className={styles.trendsContainer}>{displayTrends}</div>
+        <div className={styles.trendsContainer}><Trends /></div>
+        
       </div>
     </div>  
   );

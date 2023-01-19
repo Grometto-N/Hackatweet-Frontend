@@ -48,8 +48,21 @@ function Tweet(props) {
     .then((response) => response.json())
     .then((data) => {
         if(data.result){
-            // suppression réussie : on met à jour le reducer
+            // suppression des trends associés
+            fetch("http://localhost:3000/trends/update", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({idTweet: props.tweetDatas.tweetId, hashtags  : getHashtags(props.tweetDatas.message)}),
+            })
+            .then((response) => response.json())
+            .then((dataTrends) => { 
+              console.log("Ici", dataTrends)
+              if(dataTrends.result)
+              // suppressions réussies : on met à jour le reducer
             dispatch(deleteOneTweet(props.tweetDatas.tweetId))
+            })
+            
+            
         }
     })
   };

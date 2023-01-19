@@ -1,0 +1,162 @@
+.container {
+    display: grid;
+    width: 100vw;
+    height: 100vh;
+    grid-template-rows: repeat(12, 1fr);
+    grid-template-columns: repeat(12, 1fr);
+    background-color: #151d26;
+  }
+  
+  .leftContainer {
+    grid-row-start: 1;
+    grid-row-end: 13;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    color: white;
+    background-color: #151d26;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .home {
+    background-color: #151d26;
+    color: white;
+    font-weight: 800;
+    grid-row-start: 1;
+    grid-row-end: 3;
+    grid-column-start: 3;
+    grid-column-end: 10;
+    border-left: #29313b solid 2px;
+    border-right: #29313b solid 2px;
+    border-bottom: #29313b solid 2px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 1.5vw;
+    padding-left: 1.5vw;
+  }
+  
+  .tweetsContainer {
+    background-color: #151d26;
+    grid-row-start: 3;
+    grid-row-end: 13;
+    grid-column-start: 3;
+    grid-column-end: 10;
+    border-left: #29313b solid 2px;
+    border-right: #29313b solid 2px;
+  
+    overflow-y: scroll;
+  }
+  
+  .rightContainer {
+    background-color: #151d26;
+    color: white;
+    grid-row-start: 1;
+    grid-row-end: 13;
+    grid-column-start: 10;
+    grid-column-end: 13;
+    padding-top: 1.5vw;
+    padding-left: 1.5vw;
+  }
+  
+  .user {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .username {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .buttonTweet {
+    border-radius: 25px;
+    width: 80px;
+    height: 30px;
+    border: none;
+    background-color: #3690ed;
+    color: white;
+    font-weight: 750;
+    margin: 5px;
+    cursor: pointer;
+  }
+  
+  .buttonLogout {
+    border-radius: 25px;
+    width: 80px;
+    height: 25px;
+    border: 2px solid #545f6a;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 5px;
+  }
+  
+  .validation {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+  }
+  
+  .hashtagwriting {
+    background-color: #151d26;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 4vw;
+    margin-right: 4vw;
+  }
+  
+  .inputHashtag {
+    height: 5vh;
+    background-color: #151d26;
+    color: white;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    /* border: none;
+    border-bottom: 2px solid #4e555c; */
+    border-color: #4e555c;
+    border-radius: 5px;
+  }
+  
+  .trendsContainer {
+    width: 22vw;
+    margin-top: 20px;
+    background-color: #1b232c;
+    border-radius: 15px;
+  }
+  
+  .logoLeft {
+    margin: 10px;
+  }
+  
+  .logoApp {
+    transform: rotate(180deg);
+    height: 50px;
+    width: 50px;
+    color: white;
+  }
+  
+  .logoUser {
+    height: 30px;
+    width: 30px;
+    color: white;
+    margin: 2px;
+  }
+  
+  .pp {
+    border-radius: 50%;
+  }
+  
+  .bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .notFound {
+    color : white;
+    margin-left: 10px;
+  }
