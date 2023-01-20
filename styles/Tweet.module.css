@@ -18,6 +18,11 @@
   overflow-wrap: break-word;
 }
 
+.link {
+  color : blue;
+  cursor: pointer;
+}
+
 .heart {
   color: white;
   margin: 5px;

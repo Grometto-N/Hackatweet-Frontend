@@ -5,7 +5,7 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { changeModaleIn } from "../reducers/modaleIn";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
-import { checkBody } from "../modules/tools";
+import { checkDatas} from "../modules/tools";
 import { addUser } from "../reducers/user";
 import { useRouter } from "next/router";
 
@@ -29,7 +29,7 @@ function ModaleIn() {
     
     // on verifie si les champs sont remplis
     if (
-      checkBody({ userName: userName, password: password }, [
+      checkDatas({ userName: userName, password: password }, [
         "userName",
         "password",
       ])

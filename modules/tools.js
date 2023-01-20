@@ -1,4 +1,4 @@
-function checkBody(body, keys){
+function checkDatas(body, keys){
     let answer = true;
     for(let item of keys){
         if(body[item] === "" || !body[item]){
@@ -7,7 +7,6 @@ function checkBody(body, keys){
       }
       return answer;
 }
-
 
 function getHashtags(message) {
     const rgx = /#(\w+)\b/g;
@@ -22,11 +21,11 @@ function getHashtags(message) {
 
 function setSpan(message){
     const messageArray = message.split(' ');
-    const arraySpanHashtag = messageArray.map(elt => {
-           if(elt[0]==='#'){
-                return <span>${elt}</span>;
+    const arraySpanHashtag = messageArray.map(word => {
+           if(word.length >1 && word[0]==='#'){
+                return <span>{word + ' '}</span>;
            }else{
-                return elt;
+                return word +' ';
            }
         })
     return arraySpanHashtag;
@@ -66,4 +65,4 @@ function formattedDate(date){
 }
 
 
-module.exports = { checkBody, getHashtags, setSpan, formattedDate };
+module.exports = { checkDatas, getHashtags, setSpan, formattedDate };

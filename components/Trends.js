@@ -30,12 +30,12 @@ function Trends() {
  let displayTrends = (<div>No trend for the moment</div>)
  if(theTrends.length>0){
   displayTrends = theTrends.map((elt, i) => {
-    return (<Link href={`/hashtags/${elt.title.substring(1)}`}>
+    return (
     <div className={styles.container}>
-      <div className={styles.title}>{elt.title}</div>
-      <div className={styles.occurence}>{elt.occurence} Tweet{elt.occurence > 1 && 's'}</div>
-    </div>
-    </Link>) ;
+      <Link href={`/hashtags/${elt.title.substring(1)}`} ><span className={styles.title}>{elt.title}</span></Link>
+      {/* <div className={styles.title}></div> */}
+      <div className={styles.occurence}>{elt.occurence}Tweet{elt.occurence > 1 && 's'}</div>
+    </div>) ;
   });
  }
 

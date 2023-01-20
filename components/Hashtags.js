@@ -3,7 +3,8 @@ import Tweet from "./Tweet";
 import Trends from "./Trends";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faTwitter} from "@fortawesome/free-brands-svg-icons";
+import {faSearch } from "@fortawesome/free-solid-svg-icons";
 
 import { useSelector, useDispatch } from "react-redux";
 import { addTweet, removeTweets, setTweets } from "../reducers/alltweets";
@@ -16,6 +17,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 
 import { useRouter } from "next/router";
+
 
 
 const { getHashtags, setSpan } = require("../modules/tools");
@@ -103,6 +105,7 @@ function Hashtags() {
         }
         dispatch(setTweets(tweetsFromDB))
       }})
+      setHashtagInput("");
   }
   
   // gestion du bouton logout : on efface tous le contenu des reducers et on retourne à la page d'accueil
@@ -177,10 +180,11 @@ if(theTweets.length>0){
             placeholder="Search Hashtag"
             className={styles.inputHashtag}
             onChange={(e) => setHashtagInput(e.target.value)}
-            // onKeyPress={(e) => handleKeyPress(e)}
             onKeyDown={(e) => handleKeyPress(e)}
             value={hashtagInput}
           />
+          {/* <button className={styles.buttonLogout}><FontAwesomeIcon icon={faMagnifyingGlass}  /></button> */}
+          <button className={styles.buttonSearch} onClick={() => {handleSearch()}}><FontAwesomeIcon icon={faSearch} className={styles.iconSearch} /></button>
         </div>
       </div>
       {/* TWEETS */}

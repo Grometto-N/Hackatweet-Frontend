@@ -9,9 +9,14 @@
   color: white;
   margin-top: 5px;
   margin-bottom: 2px;
+  cursor: pointer;
 }
 
 .occurence {
   color: gray;
   margin-bottom: 8px;
 }
+
+  .title:hover {
+     color: #00F ;
+  }

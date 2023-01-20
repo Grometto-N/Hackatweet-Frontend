@@ -2,11 +2,15 @@ import styles from "../styles/Tweet.module.css";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+
 import Image from "next/image";
-import { useState, useEffect } from "react";
-const { setSpan, getHashtags, formattedDate } = require("../modules/tools");
+import Link from "next/link";
+
 import { useSelector, useDispatch } from "react-redux";
 import {updateLike, deleteOneTweet} from "../reducers/alltweets";
+
+
+const { setSpan, getHashtags, formattedDate } = require("../modules/tools");
 
 // Composant gérant l'affichage d'un tweet. La props est un objet avec les différentes informations : id, firstname, username, date , message, likes, isliked
 function Tweet(props) {
@@ -52,7 +56,7 @@ function Tweet(props) {
             fetch("http://localhost:3000/trends/update", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({idTweet: props.tweetDatas.tweetId, hashtags  : getHashtags(props.tweetDatas.message)}),
+              body: JSON.stringify({idTweet: props.tweetDatas.tweetId, hashtags  : getHashtags(props.tweetDatas.message),  token: theUser.token}),
             })
             .then((response) => response.json())
             .then((dataTrends) => { 
@@ -73,7 +77,13 @@ function Tweet(props) {
     heartIconStyle = { color: "#e74c3c", cursor: "pointer" };
   }
 
-  // gestion de l'icône delete
+// gestion de l'affichage des messages
+const formattedMessage = props.tweetDatas.message.split(' ').map(word => {
+      if(word.length >1 && word[0]==='#'){
+          return <Link href={`/hashtags/${word.substring(1)}`} ><span className={styles.link}>{word}  </span></Link>;
+      }
+      return word + ' ';
+    })
 
   return (
     <div className={styles.container}>
@@ -94,7 +104,7 @@ function Tweet(props) {
         </span>
       </div>
       {/* Message  */}
-      <div className={styles.message}>{props.tweetDatas.message}</div>
+      <div className={styles.message}>{formattedMessage}</div>
       <div className={styles.like}>
         <span className={styles.heart}>
           <FontAwesomeIcon

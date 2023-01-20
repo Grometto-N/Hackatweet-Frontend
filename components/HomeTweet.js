@@ -105,7 +105,7 @@ function HomeTweet() {
           fetch("http://localhost:3000/trends/add", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ hashtags  : getHashtags(theMessage), idTweet:  dataTweet.tweetId }),
+              body: JSON.stringify({ hashtags  : getHashtags(theMessage), idTweet:  dataTweet.tweetId, token: theUser.token }),
             }).then((response) => response.json())
               .then( dataTrends => {
               })
