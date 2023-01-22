@@ -15,6 +15,7 @@ function ModaleUp() {
   const [firstName, setFirstName] = useState("");
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const dispatch = useDispatch();
 
@@ -43,6 +44,10 @@ function ModaleUp() {
                             navigate();
                             dispatch(changeModaleUp(false));
                       }
+                      // si pb lors de l'enregistrement
+                      if(!data.result){
+                        setErrorMessage(data.error)
+                      }
               })
     }
     
@@ -64,6 +69,7 @@ function ModaleUp() {
         <div className={styles.modaleUp}>
           <FontAwesomeIcon className={styles.logoT} icon={faTwitter} />
           <p className={styles.text}>Create your Hackatweet account</p>
+          {errorMessage !== "" && <p style={{color:"red"}}> {errorMessage} </p>}
           <input
             className={styles.input}
             type="text"

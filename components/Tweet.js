@@ -10,7 +10,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {updateLike, deleteOneTweet} from "../reducers/alltweets";
 
 
-const { setSpan, getHashtags, formattedDate } = require("../modules/tools");
+const { getHashtags, formattedDate } = require("../modules/tools");
 
 // Composant gérant l'affichage d'un tweet. La props est un objet avec les différentes informations : id, firstname, username, date , message, likes, isliked
 function Tweet(props) {
@@ -26,7 +26,7 @@ function Tweet(props) {
     fetch("http://localhost:3000/tweets/like", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token, message : props.tweetDatas.message, hashtags : getHashtags(props.tweetDatas.message)}),
+      body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, hashtags : getHashtags(props.tweetDatas.message)}),
     })
     .then((response) => response.json())
     .then((data) => {
@@ -111,7 +111,6 @@ const formattedMessage = props.tweetDatas.message.split(' ').map(word => {
             icon={faHeart}
             style={heartIconStyle}
             onClick={() => handleLike()}
-            className="like"
           />
         </span>
         <span>{props.tweetDatas.likes}</span>

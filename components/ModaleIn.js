@@ -14,6 +14,7 @@ function ModaleIn() {
 
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleClose = () => {
     dispatch(changeModaleIn(false));
@@ -33,7 +34,7 @@ function ModaleIn() {
         "userName",
         "password",
       ])
-    ) {console.log("click")
+    ) {
       // on utilise la route pour enregistrer l'utilisateur
       fetch("http://localhost:3000/users/signin", {
         method: "POST",
@@ -52,6 +53,10 @@ function ModaleIn() {
             );
             navigate();
             dispatch(changeModaleIn(false));
+          }
+          // si pb lors de l'enregistrement
+          if(!data.result){
+            setErrorMessage(data.error);
           }
         });
     }
@@ -72,6 +77,7 @@ function ModaleIn() {
         <div className={styles.modaleIn}>
           <FontAwesomeIcon className={styles.logoT} icon={faTwitter} />
           <p className={styles.text}>Connect to Hackatweet</p>
+          {errorMessage !== ""  && <p style={{color : "red"}}>{errorMessage}</p>}
           <input
             className={styles.input}
             type="text"
