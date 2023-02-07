@@ -4,16 +4,19 @@ import Link from 'next/link';
 import { useState, useEffect } from "react";
 import { useSelector} from "react-redux";
 
+import { getBackEndAdress } from "../modules/tools";
+
+const BACKENDADRESS = getBackEndAdress();
+
 function Trends() {
   const [theTrends, setTheTrends]=useState([]);
 
   //récuperation du user dans le reducer
   const theTweets = useSelector((state) => state.allTweets.value);
 
-
   useEffect(() => {
       // on récupère les trends
-      fetch('http://localhost:3000/trends/all')
+      fetch(`${BACKENDADRESS}/trends/all`)
       .then(response => response.json())
       .then(dataTrends => {
           if(dataTrends.result && dataTrends.trends.length>0){

@@ -14,7 +14,6 @@ function Connection() {
   const modalVisibleIn = useSelector((state) => state.modaleIn.value);
 
   let modalDisplay;
-
   if (modalVisible) {
     modalDisplay = (
       <div className={styles.modaleUp}>
@@ -26,7 +25,6 @@ function Connection() {
   }
 
   let modalDisplayIn;
-
   if (modalVisibleIn) {
     modalDisplayIn = (
       <div className={styles.modaleUp}>

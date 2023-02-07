@@ -20,7 +20,9 @@ import { useRouter } from "next/router";
 
 
 
-const { getHashtags, setSpan } = require("../modules/tools");
+const { getBackEndAdress } = require("../modules/tools");
+
+const BACKENDADRESS = getBackEndAdress();
 
 function Hashtags() {
   const dispatch = useDispatch();
@@ -49,7 +51,7 @@ function Hashtags() {
 
   const { hashtags } = router.query;
   useEffect(() => {
-    fetch(`http://localhost:3000/tweets/${hashtags}`,{
+    fetch(`${BACKENDADRESS}/tweets/${hashtags}`,{
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: theUser.token})
@@ -81,7 +83,7 @@ function Hashtags() {
 
   // gestion du bouton recherche
   const handleSearch= () => {
-    fetch(`http://localhost:3000/tweets/${hashtagInput.replace("#","")}`,{
+    fetch(`${BACKENDADRESS}/tweets/${hashtagInput.replace("#","")}`,{
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: theUser.token})

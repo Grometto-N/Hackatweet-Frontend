@@ -10,7 +10,9 @@ import { useSelector, useDispatch } from "react-redux";
 import {updateLike, deleteOneTweet} from "../reducers/alltweets";
 
 
-const { getHashtags, formattedDate } = require("../modules/tools");
+const { getHashtags, formattedDate, getBackEndAdress } = require("../modules/tools");
+
+const BACKENDADRESS = getBackEndAdress();
 
 // Composant gérant l'affichage d'un tweet. La props est un objet avec les différentes informations : id, firstname, username, date , message, likes, isliked
 function Tweet(props) {
@@ -23,7 +25,7 @@ function Tweet(props) {
   // click sur le coeur
   const handleLike = () => {
     // on change en DB ajout ou suppression
-    fetch("http://localhost:3000/tweets/like", {
+    fetch(`${BACKENDADRESS}/tweets/like`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, hashtags : getHashtags(props.tweetDatas.message)}),
@@ -44,7 +46,7 @@ function Tweet(props) {
   // click sur la corbeille
   const handleDelete = () => {
     // on change en DB ajout ou suppression
-    fetch("http://localhost:3000/tweets/one", {
+    fetch(`${BACKENDADRESS}/tweets/one`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, userName : theUser.userName}),
@@ -53,7 +55,7 @@ function Tweet(props) {
     .then((data) => {
         if(data.result){
             // suppression des trends associés
-            fetch("http://localhost:3000/trends/update", {
+            fetch(`${BACKENDADRESS}/trends/update`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({idTweet: props.tweetDatas.tweetId, hashtags  : getHashtags(props.tweetDatas.message),  token: theUser.token}),

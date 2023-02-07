@@ -64,5 +64,9 @@ function formattedDate(date){
     return `${Math.floor(deltaHours * 60)} min`;
 }
 
+function getBackEndAdress(){
+    return "https://hackatweet-backend-six.vercel.app";
+}
 
-module.exports = { checkDatas, getHashtags, setSpan, formattedDate };
+
+module.exports = { checkDatas, getHashtags, setSpan, formattedDate, getBackEndAdress };

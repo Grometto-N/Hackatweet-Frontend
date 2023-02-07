@@ -9,6 +9,10 @@ import { checkDatas} from "../modules/tools";
 import { addUser } from "../reducers/user";
 import { useRouter } from "next/router";
 
+import { getBackEndAdress } from "../modules/tools";
+
+const BACKENDADRESS = getBackEndAdress();
+
 function ModaleIn() {
   const dispatch = useDispatch();
 
@@ -29,37 +33,35 @@ function ModaleIn() {
   const handleSign = () => {
     
     // on verifie si les champs sont remplis
-    if (
-      checkDatas({ userName: userName, password: password }, [
-        "userName",
-        "password",
-      ])
-    ) {
-      // on utilise la route pour enregistrer l'utilisateur
-      fetch("http://localhost:3000/users/signin", {
+    if (!checkDatas({ userName: userName, password: password }, ["userName","password",])) {
+      setErrorMessage("All fields must be completed")
+      return 
+    }
+      
+    // on utilise la route pour enregistrer l'utilisateur
+    fetch(`${BACKENDADRESS}/users/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userName: userName, password: password }),
-      })
-        .then((response) => response.json())
-        .then((data) => { 
-          if (data.result) {
-            dispatch(
-              addUser({
-                firstName: data.firstName,
-                userName: userName,
-                token: data.token,
-              })
-            );
-            navigate();
-            dispatch(changeModaleIn(false));
-          }
-          // si pb lors de l'enregistrement
-          if(!data.result){
+    })
+    .then((response) => response.json())
+    .then((data) => { 
+        if (data.result) {
+          dispatch(
+            addUser({
+              firstName: data.firstName,
+              userName: userName,
+              token: data.token,
+            })
+          );
+          navigate();
+          dispatch(changeModaleIn(false));
+        }
+        // si pb lors de l'enregistrement
+        if(!data.result){
             setErrorMessage(data.error);
-          }
-        });
-    }
+        }
+    });
   };
 
   return (

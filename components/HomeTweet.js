@@ -12,35 +12,30 @@ import Link from 'next/link';
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addTweet, removeTweets, setTweets } from "../reducers/alltweets";
-import { updateTrend, removeTrends,addTrends } from "../reducers/alltrends";
+import { removeTrends,addTrends } from "../reducers/alltrends";
 import { removeUser } from "../reducers/user";
 
 
 
 
-const { getHashtags, setSpan } = require("../modules/tools");
+const { getHashtags,getBackEndAdress } = require("../modules/tools");
+
+const BACKENDADRESS = getBackEndAdress();
 
 function HomeTweet() {
   const dispatch = useDispatch();
 
   // définitions des états utilisés
   const [theMessage, setTheMessage] = useState("");
-  // const [theTweets, setTheTweets] = useState([]);
-  const [theTrends, setTheTrends]=useState([]);
-  const [changeTrendinDB, setChangeTrendinDB] = useState(false);
 
   //récuperation du user dans le reducer
   const theUser = useSelector((state) => state.user.value);
   const theTweets = useSelector((state) => state.allTweets.value);
 
-  // récuperation des trends dans le reducer
-  //const theTrends = useSelector((state) => state.allTrends.value);
-  
-
   //          INITIALISATION 
   // récupération des tweets depuis la DB
   useEffect(() => {
-    fetch('http://localhost:3000/tweets',{
+    fetch(`${BACKENDADRESS}/tweets`,{
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: theUser.token})
@@ -64,21 +59,6 @@ function HomeTweet() {
         }
         dispatch(setTweets(tweetsFromDB))
         
-        
-
-        // on récupère les trends
-        // fetch('http://localhost:3000/trends/all')
-        // .then(response => response.json())
-        // .then(dataTrends => {
-        //     if(dataTrends.result && dataTrends.trends.length>0){
-        //         const trendsFromDB = [];
-        //         for(let oneTrend of dataTrends.trends){
-        //           //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
-        //           trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
-        //         }
-        //         setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
-        //     }
-        // })// fin fetch trends
       }  
     })
        
@@ -93,7 +73,7 @@ function HomeTweet() {
   // gestion du click sur le bouton tweet
   const handleTweet = () => {
     // on rajoute le tweet en DB
-    fetch("http://localhost:3000/tweets/add", {
+    fetch(`${BACKENDADRESS}/tweets/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: theUser.token, message : theMessage, hashtags: getHashtags(theMessage) }),
@@ -102,7 +82,7 @@ function HomeTweet() {
     .then((dataTweet) => {
         if (dataTweet.result) {
           // on met à jour les trends en DB en parcourant les trends
-          fetch("http://localhost:3000/trends/add", {
+          fetch(`${BACKENDADRESS}/trends/add`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ hashtags  : getHashtags(theMessage), idTweet:  dataTweet.tweetId, token: theUser.token }),
@@ -122,20 +102,9 @@ function HomeTweet() {
           }))
             }
       })  
-    //   fetch('http://localhost:3000/trends/all')
-    //   .then(response => response.json())
-    //   .then(dataTrends => {
-    //       if(dataTrends.result && dataTrends.trends.length>0){
-    //           const trendsFromDB = [];
-    //           for(let oneTrend of dataTrends.trends){
-    //             //dispatch(addTrends({title : oneTrend.hashtag , occurence :oneTrend.tweets.length} ));
-    //             trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
-    //           }
-    //           setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
-    //       }
-    //   })
     // // on reset l'input
-     setTheMessage("");
+    setTheMessage("");
+
   };
 
    // click enter de l'input du tweet
@@ -241,8 +210,10 @@ function HomeTweet() {
       {/* RIGHT */}
       <div className={styles.rightContainer}>
         <span> Trends </span>
-        <div className={styles.trendsContainer}><Trends /></div>
-        
+        <div className={styles.trendsContainer}>
+            {/* <Trends change={updateTrends}/> */}
+            <Trends />
+        </div>
       </div>
     </div>  
   );

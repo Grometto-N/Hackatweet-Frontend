@@ -9,7 +9,9 @@ import { useRouter } from "next/router";
 import { addUser } from "../reducers/user";
 import { useState } from "react";
 
-import { checkDatas } from "../modules/tools";
+import { checkDatas, getBackEndAdress } from "../modules/tools";
+
+const BACKENDADRESS = getBackEndAdress();
 
 function ModaleUp() {
   const [firstName, setFirstName] = useState("");
@@ -34,23 +36,25 @@ function ModaleUp() {
   const handleSign = () => {
     const userToCreate =  {userName : userName, firstName : firstName, password: password};
     // on verifie si les champs sont remplis
-    if(checkDatas(userToCreate,['firstName','userName', 'password'])){
-        // on utilise la route pour enregistrer l'utilisateur
-        fetch('http://localhost:3000/users/signup', {method : 'POST', headers: { 'Content-Type': 'application/json' }, body :JSON.stringify(userToCreate) }
-            ).then(response => response.json())
-        .then(data => {
-                      if(data.result){
-                            dispatch(addUser({ firstName: firstName, userName: userName, token: data.token }));
-                            navigate();
-                            dispatch(changeModaleUp(false));
-                      }
-                      // si pb lors de l'enregistrement
-                      if(!data.result){
-                        setErrorMessage(data.error)
-                      }
-              })
+    if(!checkDatas(userToCreate,['firstName','userName', 'password'])){
+      setErrorMessage("All fields must be completed")
+      return
     }
-    
+    // on utilise la route pour enregistrer l'utilisateur
+    fetch(`${BACKENDADRESS}/users/signup`, {method : 'POST', headers: { 'Content-Type': 'application/json' }, body :JSON.stringify(userToCreate) }
+    ).then(response => response.json())
+      .then(data => {
+            if(data.result){
+                dispatch(addUser({ firstName: firstName, userName: userName, token: data.token }));
+                navigate();
+                dispatch(changeModaleUp(false));
+            }
+            // si pb lors de l'enregistrement
+            if(!data.result){
+                setErrorMessage(data.error)
+            }
+      })
+
   };
   
 
