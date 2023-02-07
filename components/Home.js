@@ -1,6 +1,6 @@
 
 import styles from "../styles/Home.module.css";
-import Connection from "./connection";
+import Connection from "./Connection";
 
 
 
