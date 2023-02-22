@@ -37,15 +37,17 @@ function ModaleIn() {
       setErrorMessage("All fields must be completed")
       return 
     }
-      
+    
     // on utilise la route pour enregistrer l'utilisateur
-    fetch(`${BACKENDADRESS}/users/signin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userName: userName, password: password }),
-    })
-    .then((response) => response.json())
-    .then((data) => { 
+    async function signingIn(){
+      try{
+        const response = await fetch(`${BACKENDADRESS}/users/signin`, {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ userName: userName, password: password }),
+                                })
+        const data = await response.json();
+
         if (data.result) {
           dispatch(
             addUser({
@@ -61,7 +63,14 @@ function ModaleIn() {
         if(!data.result){
             setErrorMessage(data.error);
         }
-    });
+
+      }catch(error){
+        console.log(error)
+      }
+    } 
+
+    signingIn();
+
   };
 
   return (

@@ -16,17 +16,26 @@ function Trends() {
 
   useEffect(() => {
       // on récupère les trends
-      fetch(`${BACKENDADRESS}/trends/all`)
-      .then(response => response.json())
-      .then(dataTrends => {
+      async function getTrends(){
+        try{
+          const response = await  fetch(`${BACKENDADRESS}/trends/all`);
+          const dataTrends = await response.json();
+          
           if(dataTrends.result && dataTrends.trends.length>0){
-              const trendsFromDB = [];
-              for(let oneTrend of dataTrends.trends){
-                trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
-              }
-              setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
+            const trendsFromDB = [];
+            for(let oneTrend of dataTrends.trends){
+              trendsFromDB.push({title : oneTrend.hashtag , occurence :oneTrend.tweets.length})
+            }
+            setTheTrends(trendsFromDB.sort((a,b)=> b.occurence - a.occurence)); 
           }
-      })
+
+        }catch(error){
+            console.log(error);
+        }
+      }
+
+      getTrends();
+      
     },[theTweets]);
 
  // variable affichage des trends

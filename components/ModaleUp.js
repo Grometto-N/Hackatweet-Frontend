@@ -40,20 +40,33 @@ function ModaleUp() {
       setErrorMessage("All fields must be completed")
       return
     }
-    // on utilise la route pour enregistrer l'utilisateur
-    fetch(`${BACKENDADRESS}/users/signup`, {method : 'POST', headers: { 'Content-Type': 'application/json' }, body :JSON.stringify(userToCreate) }
-    ).then(response => response.json())
-      .then(data => {
-            if(data.result){
-                dispatch(addUser({ firstName: firstName, userName: userName, token: data.token }));
-                navigate();
-                dispatch(changeModaleUp(false));
-            }
-            // si pb lors de l'enregistrement
-            if(!data.result){
-                setErrorMessage(data.error)
-            }
-      })
+
+    async function signUp(){
+      try{
+          // on utilise la route pour enregistrer l'utilisateur
+          const response = await  fetch(`${BACKENDADRESS}/users/signup`, {
+                                      method : 'POST', 
+                                      headers: { 'Content-Type': 'application/json' }, 
+                                      body :JSON.stringify(userToCreate) 
+                                  });
+          const data = await response.json();
+
+          if(data.result){
+            dispatch(addUser({ firstName: firstName, userName: userName, token: data.token }));
+            navigate();
+            dispatch(changeModaleUp(false));
+          }
+          // si pb lors de l'enregistrement
+          if(!data.result){
+            setErrorMessage(data.error)
+          }
+
+      }catch(error){
+        console.log(error);
+      }
+    }
+    
+    signUp();
 
   };
   

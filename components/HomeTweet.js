@@ -35,13 +35,15 @@ function HomeTweet() {
   //          INITIALISATION 
   // récupération des tweets depuis la DB
   useEffect(() => {
-    fetch(`${BACKENDADRESS}/tweets`,{
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token})
-    })
-    .then(response => response.json())
-    .then(dataTweets => {
+    async function getTweets(){
+      try{
+        const response = await  fetch(`${BACKENDADRESS}/tweets`,{
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ token: theUser.token})
+                                  });
+        const dataTweets = await response.json();
+
       if(dataTweets.result){
         // on ajoute les messages au reducer
         const tweetsFromDB = []; // pour créer un tableau qu'on
@@ -57,11 +59,15 @@ function HomeTweet() {
             isUserTweet : item.isUserTweet,
           })              
         }
-        dispatch(setTweets(tweetsFromDB))
-        
-      }  
-    })
-       
+        dispatch(setTweets(tweetsFromDB));
+      }
+      }catch(error){
+        console.log("erreur", error)
+      }
+    }
+
+    getTweets();
+
     },[]);
 
     
@@ -73,39 +79,43 @@ function HomeTweet() {
   // gestion du click sur le bouton tweet
   const handleTweet = () => {
     // on rajoute le tweet en DB
-    fetch(`${BACKENDADRESS}/tweets/add`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token, message : theMessage, hashtags: getHashtags(theMessage) }),
-    })
-    .then((response) => response.json())
-    .then((dataTweet) => {
-        if (dataTweet.result) {
-          // on met à jour les trends en DB en parcourant les trends
-          fetch(`${BACKENDADRESS}/trends/add`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ hashtags  : getHashtags(theMessage), idTweet:  dataTweet.tweetId, token: theUser.token }),
-            }).then((response) => response.json())
-              .then( dataTrends => {
-              })
-          // on ajoute le tweet au reducer pour l'affichage
-          dispatch(addTweet({
-            tweetId : dataTweet.tweetId,
-            firstName: theUser.firstName,
-            userName: theUser.userName,
-            date: Date.now(),
-            message: theMessage,
-            likes: 0,
-            isLiked: false,
-            isUserTweet : true,
-          }))
-            }
-      })  
-    // // on reset l'input
-    setTheMessage("");
+    async function addingTweets(){
+    try{
+        const response = await fetch(`${BACKENDADRESS}/tweets/add`, {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ token: theUser.token, message : theMessage, hashtags: getHashtags(theMessage) }),
+                                    });
+        const dataTweets = await response.json();
 
-  };
+                if (dataTweets.result) {
+                    // on met à jour les trends en DB en parcourant les trends
+                    const responseAddTrends = await  fetch(`${BACKENDADRESS}/trends/add`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ hashtags  : getHashtags(theMessage), idTweet:  dataTweets.tweetId, token: theUser.token }),
+                        });
+                    const dataTrends = await responseAddTrends.json();
+                         // on ajoute le tweet au reducer pour l'affichage
+                            dispatch(addTweet({
+                                tweetId : dataTweets.tweetId,
+                                firstName: theUser.firstName,
+                                userName: theUser.userName,
+                                date: Date.now(),
+                                message: theMessage,
+                                likes: 0,
+                                isLiked: false,
+                                isUserTweet : true,
+                            }))  
+                      // on reset l'input
+                      setTheMessage("");
+                    }
+    }catch(error){
+            console.log("erreur", error)
+    }
+  }
+  addingTweets()
+  }
 
    // click enter de l'input du tweet
    const handlekeypress = (e) => {
@@ -132,15 +142,6 @@ function HomeTweet() {
 
   //          AFFICHAGE
   //variable affichage des tweets
-  // const displayTweets = theTweets.map((eltTweet, i) => {
-  //   return (
-  //     <Tweet
-  //       key={i}
-  //       tweetDatas = {eltTweet}
-  //     />
-  //   );
-  // });
-
   let displayTweets = (<h4 className={styles.notFound}>No tweet found</h4>)
   if(theTweets.length>0){
     displayTweets = theTweets.map((eltTweet, i) => {

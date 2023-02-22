@@ -25,52 +25,64 @@ function Tweet(props) {
   // click sur le coeur
   const handleLike = () => {
     // on change en DB ajout ou suppression
-    fetch(`${BACKENDADRESS}/tweets/like`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, hashtags : getHashtags(props.tweetDatas.message)}),
-    })
-    .then((response) => response.json())
-    .then((data) => {
-        if(data.result){
+    async function updatingLike(){
+      try{
+          const response = await fetch(`${BACKENDADRESS}/tweets/like`, {
+                                          method: "POST",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, hashtags : getHashtags(props.tweetDatas.message)}),
+                                  });
+          const data = await response.json();
+        
+          if(data.result){
             // enregistrement réussi : on met à jour le reducer
             dispatch(updateLike({
               message : props.tweetDatas.message,
               likes: data.nbLike,
               isLiked: data.likedByUser
             }))
+          }
+        }catch(error){
+          console.log("erreur", error)
         }
-    })
+    }
+    
+    updatingLike();
   };
 
   // click sur la corbeille
   const handleDelete = () => {
     // on change en DB ajout ou suppression
-    fetch(`${BACKENDADRESS}/tweets/one`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, userName : theUser.userName}),
-    })
-    .then((response) => response.json())
-    .then((data) => {
+    async function deletingTweet(){
+      try{
+        const response = await fetch(`${BACKENDADRESS}/tweets/one`, {
+                                    method: "DELETE",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ token: theUser.token, id : props.tweetDatas.tweetId, userName : theUser.userName}),
+                                  });
+        const data = await response.json();
+
         if(data.result){
             // suppression des trends associés
-            fetch(`${BACKENDADRESS}/trends/update`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({idTweet: props.tweetDatas.tweetId, hashtags  : getHashtags(props.tweetDatas.message),  token: theUser.token}),
-            })
-            .then((response) => response.json())
-            .then((dataTrends) => { 
-              console.log("Ici", dataTrends)
-              if(dataTrends.result)
-              // suppressions réussies : on met à jour le reducer
-            dispatch(deleteOneTweet(props.tweetDatas.tweetId))
-            })
-            
-            
+            const responseTrendsUpdate = await fetch(`${BACKENDADRESS}/trends/update`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({idTweet: props.tweetDatas.tweetId, hashtags  : getHashtags(props.tweetDatas.message),  token: theUser.token}),
+                  })
+            const dataTrends = await responseTrendsUpdate.json();
+
+            if(dataTrends.result){
+                // suppressions réussies : on met à jour le reducer
+                dispatch(deleteOneTweet(props.tweetDatas.tweetId))
+            }
+
         }
-    })
+      }catch(error){
+        console.log("erreur", error)
+      }
+    }
+    
+    deletingTweet();
   };
 
   // style du coeur selon s'il est séléctionné ou non

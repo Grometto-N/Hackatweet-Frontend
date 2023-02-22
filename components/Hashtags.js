@@ -4,7 +4,7 @@ import Trends from "./Trends";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTwitter} from "@fortawesome/free-brands-svg-icons";
-import {faSearch } from "@fortawesome/free-solid-svg-icons";
+import {faArrowAltCircleDown, faSearch } from "@fortawesome/free-solid-svg-icons";
 
 import { useSelector, useDispatch } from "react-redux";
 import { addTweet, removeTweets, setTweets } from "../reducers/alltweets";
@@ -51,63 +51,81 @@ function Hashtags() {
 
   const { hashtags } = router.query;
   useEffect(() => {
-    fetch(`${BACKENDADRESS}/tweets/${hashtags}`,{
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token})
-    })
-    .then(response => response.json())
-    .then(dataTweets => {
-      if(dataTweets.result){
-        // on ajoute les messages au reducer
-        const tweetsFromDB = []; // pour créer un tableau qu'on
-        for(let item of dataTweets.data){
-          tweetsFromDB.unshift({
-            tweetId : item.tweetId,
-            firstName: item.firstName,
-            userName: item.userName,
-            date: item.date,
-            message: item.message,
-            likes: item.likes.length,
-            isLiked: item.isLikedByUser,
-            isUserTweet : item.isUserTweet,
-          })              
+    async function getHashtags(){
+      try{
+        const response = await fetch(`${BACKENDADRESS}/tweets/${hashtags}`,{
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({ token: theUser.token})
+                                  });
+        const dataTweets = await response.json();
+        
+        if(dataTweets.result){
+          // on ajoute les messages au reducer
+          const tweetsFromDB = []; // pour créer un tableau qu'on
+          for(let item of dataTweets.data){
+            tweetsFromDB.unshift({
+              tweetId : item.tweetId,
+              firstName: item.firstName,
+              userName: item.userName,
+              date: item.date,
+              message: item.message,
+              likes: item.likes.length,
+              isLiked: item.isLikedByUser,
+              isUserTweet : item.isUserTweet,
+            })              
+          }
+          dispatch(setTweets(tweetsFromDB))
         }
-        dispatch(setTweets(tweetsFromDB))
-      }
+      }catch(error){
 
-  }) },[hashtags]);
+      }
+    }
+
+    getHashtags();
+    
+    },[hashtags]);
 
 
   //  GESTION DES BOUTONS
 
   // gestion du bouton recherche
   const handleSearch= () => {
-    fetch(`${BACKENDADRESS}/tweets/${hashtagInput.replace("#","")}`,{
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: theUser.token})
-    })
-    .then(response => response.json())
-    .then(dataTweets => {
-      if(dataTweets.result){
-        // on ajoute les messages au reducer
-        const tweetsFromDB = []; // pour créer un tableau qu'on
-        for(let item of dataTweets.data){
-          tweetsFromDB.unshift({
-            tweetId : item.tweetId,
-            firstName: item.firstName,
-            userName: item.userName,
-            date: item.date,
-            message: item.message,
-            likes: item.likes.length,
-            isLiked: item.isLikedByUser,
-            isUserTweet : item.isUserTweet,
-          })              
+    async function searchingTrends(){
+      try{
+        const response = await fetch(`${BACKENDADRESS}/tweets/${hashtagInput.replace("#","")}`,{
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ token: theUser.token})
+                                });
+        const dataTweets = await response.json();
+
+        if(dataTweets.result){
+          // on ajoute les messages au reducer
+          const tweetsFromDB = []; // pour créer un tableau qu'on
+          for(let item of dataTweets.data){
+            tweetsFromDB.unshift({
+              tweetId : item.tweetId,
+              firstName: item.firstName,
+              userName: item.userName,
+              date: item.date,
+              message: item.message,
+              likes: item.likes.length,
+              isLiked: item.isLikedByUser,
+              isUserTweet : item.isUserTweet,
+            })              
+          }
+          dispatch(setTweets(tweetsFromDB))
         }
-        dispatch(setTweets(tweetsFromDB))
-      }})
-      setHashtagInput("");
+        setHashtagInput("");
+
+      }catch(error){
+        console.log(error);
+      }
+    }
+    
+    searchingTrends();
+      
   }
   
   // gestion du bouton logout : on efface tous le contenu des reducers et on retourne à la page d'accueil
